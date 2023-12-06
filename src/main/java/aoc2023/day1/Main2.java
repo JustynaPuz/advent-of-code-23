@@ -27,18 +27,10 @@ public class Main2 {
     }
 
     public static void main(String[] args) {
+        String path = "inputDay1.txt";
         List<String> lines = new ArrayList<>();
 
-        try (InputStream is = Main2.class.getClassLoader().getResourceAsStream("input.txt");
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                lines.add(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
+        lines=Util.readFile(path);
 
         int sum = 0;
 

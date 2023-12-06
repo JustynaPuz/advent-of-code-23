@@ -10,18 +10,10 @@ import java.util.List;
 public class Main1 {
 
     public static void main(String[] args) {
+        String path = "inputDay1.txt";
         List<String> lines = new ArrayList<>();
 
-        try (InputStream is = Main1.class.getClassLoader().getResourceAsStream("inputDay1.txt");
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                lines.add(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
+        lines=Util.readFile(path);
 
         int sum = 0;
 
