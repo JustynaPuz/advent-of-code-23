@@ -1,5 +1,6 @@
-package aoc2023;
+package aoc2023.Util;
 
+import aoc2023.day9.Main1;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
