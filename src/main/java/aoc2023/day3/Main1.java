@@ -10,95 +10,73 @@ import java.util.List;
 
 public class Main1 {
 
-    private static class numberParameters {
-        int startOfNumber = -1;
-        int endOfNumber = -1;
-        int length = 0;
+    private record NumberInfo(long value, int startIndex, int endIndex, int lineIndex) {
 
-        @Override
-        public String toString() {
-            return "numberParameters{" +
-                    "startOfNumber=" + startOfNumber +
-                    ", endOfNumber=" + endOfNumber +
-                    ", length=" + length +
-                    '}';
-        }
     }
-    public enum whichLine {First, Last, Center}
-    public static int checkLengthOfNumber(String line) {
-        int length = 0;
-        for (int i = 0; i < line.length(); i++) {
-            if (Character.isDigit(line.charAt(i))) {
-                length++;
-            }
-            if (!Character.isDigit(line.charAt(i))) {
-                return length;
-            }
+
+    public static int findEndOfNumber(String line, int numberStart) {
+        int index = numberStart;
+        while (index < line.length() && Character.isDigit(line.charAt(index))) {
+            index++;
         }
-        return length;
+        return index;
     }
-    public static boolean checkLine(numberParameters parameters, int position, int howLong, String line) {
-        for (int i = position; i < howLong; i++) {
-            if (!Character.isDigit(line.charAt(i))
-                    && line.charAt(i) != '.') {
-                return true;
+
+    public static List<NumberInfo> findAllNumbersInLine(String line, int lineIndex) {
+        ArrayList<NumberInfo> numbers = new ArrayList<>();
+        int x = 0;
+        while (x < line.length()) {
+            if (Character.isDigit(line.charAt(x))) {
+                int numberEnd = findEndOfNumber(line, x);
+                int numberValue = Integer.parseInt(line.substring(x, numberEnd));
+                numbers.add(new NumberInfo(numberValue, x, numberEnd, lineIndex));
+                x = numberEnd + 1;
+            } else {
+                x++;
             }
         }
-        return false;
+        return numbers;
     }
-    public static boolean checkNumber(numberParameters parameters, String currentLine,
-            String followingLine, String previousLine, whichLine flag) {
-        int startPosition = -1;
-        int howLong = -1;
-        //check in current line
-        if (parameters.startOfNumber == 0) {
-            startPosition = 0;
-            howLong = parameters.length + 1;
-            if ((currentLine.charAt(parameters.endOfNumber + 1)) != '.') {
-                return true;
-            }
-        } else if (parameters.endOfNumber == currentLine.length() - 1) {
 
-            startPosition = parameters.startOfNumber - 1;
-            howLong = parameters.length + parameters.startOfNumber;
-            if ((currentLine.charAt(parameters.startOfNumber - 1)) != '.') {
-                return true;
-            }
+    public static boolean isAdjacentToAnySign(NumberInfo numberInfo, List<String> lines) {
+        String line = lines.get(numberInfo.lineIndex);
+        boolean signFromLeft = numberInfo.startIndex > 0
+                && !Character.isDigit(line.charAt(numberInfo.startIndex - 1))
+                && line.charAt(numberInfo.startIndex - 1) != '.';
+        boolean signFromRight = numberInfo.endIndex < line.length()
+                && !Character.isDigit(line.charAt(numberInfo.endIndex))
+                && line.charAt(numberInfo.endIndex) != '.';
 
-        } else {
-            startPosition = parameters.startOfNumber - 1;
-            howLong = parameters.length + parameters.startOfNumber + 1;
-            if ((currentLine.charAt(parameters.startOfNumber - 1)) != '.'
-                    || currentLine.charAt(parameters.endOfNumber + 1) != '.') {
-                return true;
+        int leftRange = Integer.max(0, numberInfo.startIndex - 1);
+        int rightRange = Integer.min(line.length()-1, numberInfo.endIndex);
+        boolean signAbove = false;
+        if (numberInfo.lineIndex != 0) {
+            for (char field : lines.get(numberInfo.lineIndex - 1).substring(leftRange, rightRange + 1).toCharArray()) {
+                if (!Character.isDigit(field) && field != '.') {
+                    signAbove = true;
+                    break;
+                }
+            }
+        }
+        boolean signBelow = false;
+        if (numberInfo.lineIndex != lines.size() - 1) {
+
+            for (char field : lines.get(numberInfo.lineIndex + 1).substring(leftRange, rightRange + 1).toCharArray()) {
+                if (!Character.isDigit(field) && field != '.') {
+                    signBelow = true;
+                    break;
+                }
             }
         }
 
-        if (flag == whichLine.First) {
-            if (checkLine(parameters, startPosition, howLong, followingLine)) {
-                return true;
-            }
-        } else if (flag == whichLine.Last) {
-            if (checkLine(parameters, startPosition, howLong, previousLine)) {
-                return true;
-            }
-        } else if (flag == whichLine.Center) {
-            if (checkLine(parameters, startPosition, howLong, previousLine) || checkLine(parameters,
-                    startPosition, howLong, followingLine)) {
-                return true;
-            }
-        }
-        return false;
+        return signBelow || signAbove || signFromLeft || signFromRight;
     }
 
     public static void main(String[] args) {
         List<String> lines = new ArrayList<>();
-        List<String> partsOfEngine = new ArrayList<>();
-        int sum = 0;
-        whichLine flag;
         try (InputStream is = aoc2023.day3.Main1.class.getClassLoader()
                 .getResourceAsStream("inputDay3.txt");
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+             BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 lines.add(line);
@@ -107,69 +85,19 @@ public class Main1 {
             e.printStackTrace();
             System.exit(-1);
         }
-        int numberOfLine = 0;
 
+        List<NumberInfo> allNumbers = new ArrayList<>();
+        int x = 0;
         for (String line : lines) {
-            List<String> numbersForLine = new ArrayList<>();
-            List<numberParameters> numberParameters = new ArrayList<>();
-
-            for (int i = 0; i < line.length(); i++) {
-
-                if (Character.isDigit(line.charAt(i))) {
-
-                    numberParameters positions = new numberParameters();
-                    int length = 0;
-                    if (positions.startOfNumber == -1) {
-                        positions.startOfNumber = i;
-
-                    }
-                    if (i < line.length() - 3) {
-                        length = checkLengthOfNumber(line.substring(i, i + 3));
-                    } else {
-                        length = checkLengthOfNumber(line.substring(i, i + (line.length() - i)));
-                    }
-                    String number = line.substring(i, i + length);
-                    positions.endOfNumber = length + i - 1;
-                    positions.length = length;
-                    i += length - 1;
-                    numbersForLine.add(number);
-                    numberParameters.add(positions);
-                }
-            }
-            int index = 0;
-            if (numberOfLine == 0) {
-                index = 0;
-                flag = whichLine.First;
-                for (numberParameters parameters : numberParameters) {
-                    if (checkNumber(parameters, line, lines.get(numberOfLine + 1), line, flag)) {
-                        partsOfEngine.add(numbersForLine.get(index));
-                    }
-                    index++;
-                }
-            } else if (numberOfLine == lines.size() - 1) {
-                index = 0;
-                flag = whichLine.Last;
-                for (numberParameters parameters : numberParameters) {
-                    if (checkNumber(parameters, line, line, lines.get(numberOfLine - 1), flag)) {
-                        partsOfEngine.add(numbersForLine.get(index));
-                    }
-                    index++;
-                }
-            } else {
-                index = 0;
-                flag = whichLine.Center;
-                for (numberParameters parameters : numberParameters) {
-                    if (checkNumber(parameters, line, lines.get(numberOfLine + 1),
-                            lines.get(numberOfLine - 1), flag)) {
-                        partsOfEngine.add(numbersForLine.get(index));
-                    }
-                    index++;
-                }
-            }
-            numberOfLine++;
+            allNumbers.addAll(findAllNumbersInLine(line, x));
+            x++;
         }
-        for (String s : partsOfEngine) {
-            sum += Integer.parseInt(s);
+        long sum = 0;
+
+        for(NumberInfo info : allNumbers) {
+            if (isAdjacentToAnySign(info, lines)){
+                sum += info.value;
+            }
         }
         System.out.println(sum);
     }
