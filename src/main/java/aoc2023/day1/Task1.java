@@ -7,7 +7,7 @@ import java.util.List;
 public class Task1 {
 
     public static void main(String[] args) {
-        String path = "inputDay1.txt";
+        String path = "src/main/resources/inputDay1.txt";
         List<String> lines = Util.readFile(path);
 
         int sum = 0;
