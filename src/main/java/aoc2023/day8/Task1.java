@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class Main1 {
+public class Task1 {
 
     public static void main(String[] args) {
         List<String> lines = Util.readFile("src/main/resources/inputDay8.txt");
@@ -31,11 +31,10 @@ public class Main1 {
             for (Character c : instructions) {
                 if (c == 'R') {
                     current = RightMoves.get(current);
-                    counter++;
                 } else {
                     current = LeftMoves.get(current);
-                    counter++;
                 }
+                counter++;
             }
         }
         System.out.println(counter);
