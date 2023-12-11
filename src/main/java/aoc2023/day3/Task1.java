@@ -1,5 +1,7 @@
 package aoc2023.day3;
 
+import aoc2023.Util.Util;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +12,7 @@ import java.util.List;
 
 public class Task1 {
 
-    private record NumberInfo(long value, int startIndex, int endIndex, int lineIndex) {
+    public record NumberInfo(long value, int startIndex, int endIndex, int lineIndex) {
 
     }
 
@@ -73,19 +75,7 @@ public class Task1 {
     }
 
     public static void main(String[] args) {
-        List<String> lines = new ArrayList<>();
-        try (InputStream is = Task1.class.getClassLoader()
-                .getResourceAsStream("inputDay3.txt");
-             BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                lines.add(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-
+        List<String> lines = Util.readFile("inputDay3.txt");
         List<NumberInfo> allNumbers = new ArrayList<>();
         int x = 0;
         for (String line : lines) {
