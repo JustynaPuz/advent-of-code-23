@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 
-public class Main2 {
+public class Task2 {
 
     private static class numberParameters {
 
@@ -153,7 +153,7 @@ public class Main2 {
         List<engineParts> partsOfEngine = new ArrayList<>();
         int sum = 0;
         whichLine flag;
-        try (InputStream is = aoc2023.day3.Main1.class.getClassLoader()
+        try (InputStream is = Task1.class.getClassLoader()
                 .getResourceAsStream("inputDay3.txt");
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
             String line;

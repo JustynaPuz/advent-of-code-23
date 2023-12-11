@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Main1 {
+public class Task1 {
 
     private record NumberInfo(long value, int startIndex, int endIndex, int lineIndex) {
 
@@ -74,7 +74,7 @@ public class Main1 {
 
     public static void main(String[] args) {
         List<String> lines = new ArrayList<>();
-        try (InputStream is = aoc2023.day3.Main1.class.getClassLoader()
+        try (InputStream is = Task1.class.getClassLoader()
                 .getResourceAsStream("inputDay3.txt");
              BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
             String line;
